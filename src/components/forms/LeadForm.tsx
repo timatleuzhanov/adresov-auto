@@ -105,6 +105,9 @@ export function LeadForm({
     if (values.vinOrPlate) meta.vinOrPlate = values.vinOrPlate;
     if (values.serviceType) meta.serviceType = values.serviceType;
     if (values.serviceDate) meta.serviceDate = values.serviceDate;
+    if (type === LeadType.CONSULTATION) {
+      meta.source = "Форма «Консультация» на главной";
+    }
 
     const res = await fetch("/api/leads", {
       method: "POST",
