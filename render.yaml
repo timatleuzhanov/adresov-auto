@@ -1,6 +1,8 @@
+# Blueprint: https://render.com/docs/infrastructure-as-code
+# Опциональные переменные (SMTP, reCAPTCHA, соцсети) добавьте вручную в дашборде Render.
 services:
   - type: web
-    name: adresov-web
+    name: adresov-auto
     runtime: node
     plan: starter
     region: frankfurt

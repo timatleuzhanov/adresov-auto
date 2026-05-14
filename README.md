@@ -23,18 +23,13 @@ npm run dev
 
 ## Переменные окружения
 
-См. `.env.example`. Важные:
+Полный шаблон с комментариями — в [`.env.example`](./.env.example). Кратко:
 
-- `DATABASE_URL` — для SQLite: `file:./dev.db` (файл создаётся в `prisma/`).
-- `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` — длинные случайные строки (для MVP используется access JWT в cookie `access_token`).
+- `DATABASE_URL` — локально SQLite: `file:./dev.db` (файл в каталоге `prisma/`). На Render — URL **PostgreSQL**.
+- `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` — длинные случайные строки (для продакшена не используйте значения из примера).
 - `ADMIN_SEED_PASSWORD` — пароль сид-суперадмина.
-- `SMTP_*` — опционально: если заданы, при создании заявки уходит email через Nodemailer.
-- `RECAPTCHA_SECRET`, `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` — опционально: если секрет не задан, сервер **не блокирует** отправку форм (удобно для локальной разработки).
-
-Публичный базовый URL для метаданных и sitemap:
-
-- `NEXT_PUBLIC_SITE_URL` — например `https://example.kz`
-- `NEXT_PUBLIC_TELEGRAM_URL`, `NEXT_PUBLIC_INSTAGRAM_URL` — опционально, если не заданы ссылки в **Админка → Настройки** (`telegramUrl`, `instagramUrl`).
+- `NEXT_PUBLIC_SITE_URL` — локально `http://localhost:3000`, на проде — HTTPS-URL сервиса.
+- `SMTP_*`, `RECAPTCHA_*`, `NEXT_PUBLIC_TELEGRAM_URL`, `NEXT_PUBLIC_INSTAGRAM_URL` — опционально (см. `.env.example`).
 
 ## Сборка (локально)
 
@@ -45,16 +40,56 @@ npm start
 
 ## Деплой на Render.com
 
-В репозитории есть `render.yaml` (Blueprint). Создайте сервис **Web** и задайте переменные:
+Репозиторий: корень = приложение Next (`package.json` на верхнем уровне). Подключите [GitHub `adresov-auto`](https://github.com/timatleuzhanov/adresov-auto) как **Web Service** или используйте Blueprint из [`render.yaml`](./render.yaml).
 
-- `DATABASE_URL` — для продакшена лучше **PostgreSQL** (Render Postgres или Supabase). Пример: `postgresql://user:pass@host:5432/db?sslmode=require`.
-- `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `ADMIN_SEED_PASSWORD`, `NEXT_PUBLIC_SITE_URL`.
+### Команды в панели Render (если создаёте сервис вручную)
 
-Сборка на Render: `npm ci && npm run render:build`. Скрипт `scripts/render-build.cjs` при `DATABASE_URL` с **postgres** временно меняет в `schema.prisma` провайдер на `postgresql`, выполняет `migrate deploy` (или `db push`), собирает Next.js и **восстанавливает** sqlite-вариант в репозитории кэша сборки.
+| Поле | Значение |
+|------|----------|
+| **Runtime** | Node |
+| **Build Command** | `npm ci && npm run render:build` |
+| **Start Command** | `npm run start` |
+| **Health Check Path** | `/` |
 
-После первого деплоя с Postgres выполните однократно (через **Shell** на Render): `npx prisma db seed` или заведите админа вручную.
+`npm run render:build` запускает [`scripts/render-build.cjs`](./scripts/render-build.cjs): при `DATABASE_URL` с **postgres** временно переключает `provider` в `schema.prisma` на PostgreSQL, выполняет `prisma migrate deploy` (если есть миграции) или **`prisma db push`**, затем `next build`. После успешной сборки файл схемы в деплое остаётся с **postgresql** — так в **Shell** на Render работает `npx prisma db seed`.
 
-**SQLite на Render** возможен только с **Persistent Disk** и путём вроде `file:/var/data/db.sqlite` — при пересборке без диска данные теряются. Для Supabase ориентируйтесь на PostgreSQL.
+### Переменные окружения на Render
+
+Задайте в **Environment** (одинаково для build и runtime; Render подставляет их на этапе сборки):
+
+**Обязательно**
+
+| Переменная | Описание |
+|------------|----------|
+| `DATABASE_URL` | **Рекомендуется PostgreSQL** (создайте **PostgreSQL** в Render и вставьте **Internal Database URL**, часто с суффиксом `?sslmode=require`). SQLite на обычном Web Service без диска не подходит — данные пропадут при деплое. |
+| `JWT_ACCESS_SECRET` | Случайная строка **≥ 32 символов** (например `openssl rand -hex 32`). |
+| `JWT_REFRESH_SECRET` | Зарезервировано под будущий refresh-flow; пока в коде не используется, но задайте ту же длину, что и у access. |
+| `ADMIN_SEED_PASSWORD` | Пароль суперадмина для `npx prisma db seed` в Shell после первого деплоя. |
+| `NEXT_PUBLIC_SITE_URL` | Публичный URL сервиса, например `https://adresov-auto.onrender.com` (для `metadataBase`, sitemap, robots). |
+
+**Опционально**
+
+| Переменная | Описание |
+|------------|----------|
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` | Почта при новой заявке (`notify-lead`). |
+| `RECAPTCHA_SECRET`, `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | reCAPTCHA v3; без секрета формы всё равно принимаются. |
+| `NEXT_PUBLIC_TELEGRAM_URL`, `NEXT_PUBLIC_INSTAGRAM_URL` | Если не заданы в админке → настройки сайта. |
+| `NODE_VERSION` | `20` (как в `render.yaml`; в дашборде можно выбрать Node 20 вместо env). |
+
+После первого успешного деплоя: **Render Shell** → `npx prisma db seed` (создаёт настройки по умолчанию, демо-авто, пользователей). Вход в админку: `admin@adresov.kz` / пароль из `ADMIN_SEED_PASSWORD`.
+
+### Локально без сюрпризов
+
+```bash
+cp .env.example .env
+npm install
+npx prisma db push
+npm run db:seed
+npm run dev
+```
+
+- **`npm run build`** / **`npm start`**: нужен рабочий `.env` с `DATABASE_URL` и созданная БД (`db push` или существующий файл SQLite).
+- Корневой **`export const dynamic = "force-dynamic"`** в `layout` и на страницах с Prisma снижает риск падения **`next build`** без доступной БД; для продакшена на Render с Postgres всё равно задавайте `DATABASE_URL` до сборки.
 
 ## SQLite ↔ PostgreSQL («зеркало» для будущего Supabase)
 

@@ -5,6 +5,9 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { prisma } from "@/lib/prisma";
 
+/** Не дергать БД на этапе `next build` без DATABASE_URL (удобнее локально и в CI). */
+export const dynamic = "force-dynamic";
+
 const montserrat = Montserrat({
   subsets: ["latin", "cyrillic"],
   variable: "--font-montserrat",

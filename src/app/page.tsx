@@ -9,6 +9,8 @@ import { PopularSlider } from "@/components/cars/PopularSlider";
 import { CreditCalculator } from "@/components/credit/CreditCalculator";
 import { LeadForm } from "@/components/forms/LeadForm";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const settings = await prisma.siteSettings.findUnique({ where: { id: "default" } });
   const now = new Date();

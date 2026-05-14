@@ -7,6 +7,8 @@ export const metadata = {
   description: "Адрес, телефон, карта и форма обратного звонка",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function ContactsPage() {
   const s = await prisma.siteSettings.findUnique({ where: { id: "default" } });
   return (

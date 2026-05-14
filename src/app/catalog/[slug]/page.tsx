@@ -25,6 +25,8 @@ function statusLabel(s: CarStatus) {
   return "Архив";
 }
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const car = await prisma.car.findFirst({
     where: { slug: params.slug, status: { not: CarStatus.ARCHIVE } },

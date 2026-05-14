@@ -8,6 +8,8 @@ export const metadata = {
   description: "Кредитный калькулятор и заявка на кредит в Алматы",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function CreditPage() {
   const s = await prisma.siteSettings.findUnique({ where: { id: "default" } });
   return (
