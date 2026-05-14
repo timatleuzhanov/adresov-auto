@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: adresov-web
+    runtime: node
+    plan: starter
+    region: frankfurt
+    buildCommand: npm ci && npm run render:build
+    startCommand: npm run start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: ADMIN_SEED_PASSWORD
+        sync: false
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false

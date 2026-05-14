@@ -1,0 +1,195 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SUPERADMIN
+  MANAGER
+  OPERATOR
+}
+
+model User {
+  id             String        @id @default(cuid())
+  email          String        @unique
+  passwordHash   String
+  role           UserRole      @default(OPERATOR)
+  failedAttempts Int           @default(0)
+  lockedUntil    DateTime?
+  createdAt      DateTime      @default(now())
+  assignedLeads  Lead[]        @relation("AssignedLeads")
+  comments       LeadComment[]
+}
+
+enum CarCondition {
+  NEW
+  USED
+}
+
+enum CarStatus {
+  IN_STOCK
+  ON_ORDER
+  SOLD
+  ARCHIVE
+}
+
+enum BodyType {
+  SEDAN
+  SUV
+  HATCHBACK
+  CROSSOVER
+  MINIVAN
+}
+
+enum FuelType {
+  PETROL
+  DIESEL
+  HYBRID
+  ELECTRIC
+}
+
+enum TransmissionType {
+  AUTO
+  MANUAL
+  VARIATOR
+}
+
+model Car {
+  id               String             @id @default(cuid())
+  slug             String             @unique
+  brand            String
+  model            String
+  year             Int
+  bodyType         BodyType
+  fuel             FuelType
+  transmission     TransmissionType
+  condition        CarCondition
+  priceFrom        Int?
+  priceOnRequest   Boolean            @default(false)
+  mileage          Int                @default(0)
+  engine           String
+  drive            String
+  acceleration     String
+  maxSpeed         String
+  fuelConsumption  String
+  trunkVolume      String
+  color            String
+  vin              String?
+  description      String
+  status           CarStatus          @default(IN_STOCK)
+  tagsJson         String             @default("[]")
+  titleSeo         String?
+  descSeo          String?
+  featured         Boolean            @default(false)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  images           CarImage[]
+  trims            CarTrim[]
+  leads            Lead[]
+  promotions       PromotionCar[]
+}
+
+model CarImage {
+  id    String @id @default(cuid())
+  carId String
+  car   Car    @relation(fields: [carId], references: [id], onDelete: Cascade)
+  path  String
+  sort  Int    @default(0)
+}
+
+model CarTrim {
+  id       String @id @default(cuid())
+  carId    String
+  car      Car    @relation(fields: [carId], references: [id], onDelete: Cascade)
+  name     String
+  price    Int
+  optionsJson String @default("[]")
+}
+
+enum LeadType {
+  TEST_DRIVE
+  CONSULTATION
+  CREDIT
+  TRADE_IN
+  CALLBACK
+  SERVICE
+  QUESTION
+  PURCHASE
+  QUICK
+}
+
+enum LeadStatus {
+  NEW
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+model Lead {
+  id           String      @id @default(cuid())
+  type         LeadType
+  status       LeadStatus  @default(NEW)
+  name         String
+  phone        String
+  email        String?
+  message      String?
+  carId        String?
+  car          Car?        @relation(fields: [carId], references: [id])
+  metaJson     String      @default("{}")
+  assignedToId String?
+  assignedTo   User?       @relation("AssignedLeads", fields: [assignedToId], references: [id])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  comments     LeadComment[]
+}
+
+model LeadComment {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  text      String
+  createdAt DateTime @default(now())
+}
+
+model Promotion {
+  id          String         @id @default(cuid())
+  title       String
+  description String
+  image       String?
+  startDate   DateTime
+  endDate     DateTime
+  cars        PromotionCar[]
+}
+
+model PromotionCar {
+  promotionId String
+  promotion   Promotion @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+  carId       String
+  car         Car       @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  @@id([promotionId, carId])
+}
+
+model SiteSettings {
+  id                 String  @id @default("default")
+  phone              String
+  email              String
+  address            String
+  workHours          String
+  mapEmbedUrl        String?
+  lat                Float?
+  lng                Float?
+  defaultCreditRate  Float   @default(14.5)
+  whatsapp           String?
+  siteTitle          String?
+  siteDescription    String?
+  slogan             String  @default("Новые и автомобили с пробегом в Алматы")
+  telegramUrl        String?
+  instagramUrl       String?
+}

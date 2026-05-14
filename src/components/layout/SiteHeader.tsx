@@ -1,0 +1,129 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { cn } from "@/lib/cn";
+
+const links = [
+  { href: "/catalog", label: "Модели" },
+  { href: "/promotions", label: "Акции" },
+  { href: "/credit", label: "Кредит" },
+  { href: "/trade-in", label: "Trade-in" },
+  { href: "/service", label: "Сервис" },
+  { href: "/about", label: "О компании" },
+  { href: "/contacts", label: "Контакты" },
+];
+
+type SiteJson = {
+  telegramUrl?: string | null;
+  instagramUrl?: string | null;
+};
+
+export function SiteHeader() {
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const [social, setSocial] = useState<SiteJson>({});
+  const isAdmin = pathname?.startsWith("/admin") ?? false;
+
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    fetch("/api/site")
+      .then((r) => r.json())
+      .then((d: SiteJson) => setSocial({ telegramUrl: d.telegramUrl, instagramUrl: d.instagramUrl }))
+      .catch(() => {});
+  }, []);
+
+  if (isAdmin) return null;
+
+  const tg = social.telegramUrl || process.env.NEXT_PUBLIC_TELEGRAM_URL;
+  const ig = social.instagramUrl || process.env.NEXT_PUBLIC_INSTAGRAM_URL;
+
+  return (
+    <header className="sticky top-0 z-50 border-b border-logo/20 bg-black text-logo">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+        <Link href="/" className="flex shrink-0 items-center gap-3">
+          <Image
+            src="/images/logo.png"
+            alt="ADRESOV AUTO"
+            width={320}
+            height={64}
+            className="h-12 w-auto max-w-[min(52vw,280px)] object-contain object-left md:h-16 md:max-w-[min(40vw,360px)]"
+            priority
+          />
+        </Link>
+        <nav className="hidden items-center gap-6 text-sm font-medium text-logo/90 md:flex">
+          {links.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              className={cn(
+                "transition hover:text-logo-bright",
+                pathname === l.href || pathname.startsWith(l.href + "/") ? "text-logo-bright" : "text-logo/70"
+              )}
+            >
+              {l.label}
+            </Link>
+          ))}
+        </nav>
+        <div className="hidden items-center gap-3 md:flex">
+          {tg && (
+            <a href={tg} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-logo/80 hover:text-logo-bright">
+              Telegram
+            </a>
+          )}
+          {ig && (
+            <a href={ig} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-logo/80 hover:text-logo-bright">
+              Instagram
+            </a>
+          )}
+          <Link
+            href="/catalog"
+            className="rounded border border-logo bg-logo px-4 py-2 text-xs font-semibold uppercase tracking-wide text-black hover:bg-logo-bright"
+          >
+            Каталог
+          </Link>
+        </div>
+        <button
+          type="button"
+          className="inline-flex rounded border border-logo/35 px-3 py-2 text-sm text-logo md:hidden"
+          aria-expanded={open}
+          aria-label="Меню"
+          onClick={() => setOpen((v) => !v)}
+        >
+          Меню
+        </button>
+      </div>
+      {open && (
+        <div className="border-t border-logo/20 bg-black px-4 pb-4 md:hidden">
+          <div className="flex flex-col gap-3 pt-3 text-sm">
+            {links.map((l) => (
+              <Link key={l.href} href={l.href} className="py-1 text-logo/90">
+                {l.label}
+              </Link>
+            ))}
+            <div className="flex gap-4 pt-2">
+              {tg && (
+                <a href={tg} className="text-logo/80 hover:text-logo-bright" target="_blank" rel="noreferrer">
+                  Telegram
+                </a>
+              )}
+              {ig && (
+                <a href={ig} className="text-logo/80 hover:text-logo-bright" target="_blank" rel="noreferrer">
+                  Instagram
+                </a>
+              )}
+            </div>
+            <Link href="/catalog" className="rounded border border-logo bg-logo py-2 text-center text-sm font-semibold text-black hover:bg-logo-bright">
+              Каталог
+            </Link>
+          </div>
+        </div>
+      )}
+    </header>
+  );
+}

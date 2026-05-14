@@ -1,0 +1,52 @@
+import Link from "next/link";
+import { prisma } from "@/lib/prisma";
+import { getAdminSession, canEditCars } from "@/lib/auth";
+import { redirect } from "next/navigation";
+
+export default async function AdminCarsPage() {
+  const s = await getAdminSession();
+  if (!s) redirect("/admin/login");
+  if (!canEditCars(s.role)) redirect("/admin/dashboard");
+
+  const cars = await prisma.car.findMany({
+    orderBy: { updatedAt: "desc" },
+    take: 200,
+    include: { images: { orderBy: { sort: "asc" }, take: 1 } },
+  });
+
+  return (
+    <div className="rounded-card bg-white p-6 shadow-card">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-heading text-2xl font-bold text-primary">Автомобили</h1>
+        <Link href="/admin/cars/new" className="rounded-btn bg-neutral-900 px-4 py-2 text-sm font-semibold text-white hover:bg-neutral-800">
+          Добавить
+        </Link>
+      </div>
+      <div className="mt-6 overflow-x-auto">
+        <table className="min-w-full text-left text-sm">
+          <thead className="text-xs text-sub">
+            <tr>
+              <th className="py-2">Авто</th>
+              <th className="py-2">Статус</th>
+              <th className="py-2">Цена</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cars.map((c) => (
+              <tr key={c.id} className="border-t border-black/10">
+                <td className="py-3">
+                  <Link className="font-semibold text-primary hover:underline" href={`/admin/cars/${c.id}`}>
+                    {c.brand} {c.model} {c.year}
+                  </Link>
+                  <div className="text-xs text-sub">{c.slug}</div>
+                </td>
+                <td className="py-3">{c.status}</td>
+                <td className="py-3">{c.priceOnRequest ? "По запросу" : c.priceFrom?.toLocaleString("ru-RU")}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}

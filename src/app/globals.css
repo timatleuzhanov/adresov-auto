@@ -3,25 +3,33 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-primary: #0a0a0a;
+  --color-accent: #404040;
+  --color-bg: #ffffff;
+  --color-muted: #f4f4f4;
+  --color-text: #0a0a0a;
+  --color-text-muted: #737373;
+  /* Тон основного текста логотипа (серебро на чёрном) */
+  --color-logo-silver: #c6c6c6;
+  --color-logo-silver-bright: #e0e0e0;
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.06);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--color-text);
+  background: var(--color-bg);
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+.card-shadow {
+  box-shadow: var(--shadow-card);
 }
