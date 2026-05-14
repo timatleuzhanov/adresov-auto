@@ -22,6 +22,52 @@ function isSqliteFileUrl(url) {
   return String(url).trim().toLowerCase().startsWith("file:");
 }
 
+/** Абсолютный путь к файлу БД из SQLite connection string (для проверок на Render). */
+function sqlitePathFromFileUrl(databaseUrl) {
+  const u = String(databaseUrl).trim();
+  if (!/^file:/i.test(u)) return null;
+  let rest = u.slice("file:".length);
+  if (rest.startsWith("//")) {
+    rest = "/" + rest.slice(2).replace(/^\/+/, "");
+  }
+  if (rest.startsWith("./") || (!rest.startsWith("/") && !rest.startsWith("\\\\") && rest.length > 0)) {
+    if (/^[a-zA-Z]:/.test(rest)) {
+      return path.normalize(rest);
+    }
+    if (!rest.startsWith("/")) {
+      return path.resolve(process.cwd(), rest.replace(/^\.\//, ""));
+    }
+  }
+  if (rest.startsWith("/")) {
+    return path.normalize(rest);
+  }
+  return null;
+}
+
+/** SQLite на диске Render и абсолютные пути вне репозитория на build не работают как ожидается. */
+function assertSqlitePathOkForRenderBuild(databaseUrl) {
+  if (process.env.RENDER !== "true") return;
+  const fsPath = sqlitePathFromFileUrl(databaseUrl);
+  if (!fsPath) return;
+  try {
+    if (fs.existsSync(fsPath) && fs.statSync(fsPath).isDirectory()) {
+      console.error(
+        `[render-build] ${databaseUrl} указывает на каталог. Задайте путь к файлу базы, например file:/var/data/adresov.db (не только mount point).`
+      );
+      process.exit(1);
+    }
+  } catch (_) {
+    /* ignore stat errors */
+  }
+  const n = path.normalize(fsPath);
+  if (n === "/var/data" || n.startsWith("/var/data/") || n.startsWith("/mnt/")) {
+    console.error(
+      "[render-build] SQLite на постоянном диске Render (/var/data, /mnt/...) на этапе build недоступен: диск монтируется у уже запущенного инстанса, а не в среде сборки. Подключите Managed PostgreSQL и укажите DATABASE_URL=postgresql://... (рекомендуется), либо выполняйте prisma db push в startCommand после старта, а не в render:build."
+    );
+    process.exit(1);
+  }
+}
+
 /**
  * Prisma SQLite требует ровно префикс `file:` (нижний регистр). На Render часто
  * забывают DATABASE_URL или вставляют postgres-URL с другим регистром схемы.
@@ -100,6 +146,7 @@ try {
       );
       process.exit(1);
     }
+    assertSqlitePathOkForRenderBuild(db);
     console.log("[render-build] SQLite: prisma db push");
     execSync("npx prisma db push --skip-generate", { stdio: "inherit", env: childEnv });
   }
