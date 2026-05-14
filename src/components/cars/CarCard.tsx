@@ -18,15 +18,15 @@ export function CarCard({ car }: { car: CarCardModel }) {
   const img = car.images[0]?.path;
   const tagList = tags(car.tagsJson);
   return (
-    <article className="overflow-hidden rounded-card border border-neutral-200 bg-white shadow-card">
+    <article className="group overflow-hidden rounded-card border border-neutral-200 bg-white shadow-card transition-shadow duration-300 hover:shadow-[0_12px_40px_rgba(0,0,0,0.1)]">
       <Link href={`/catalog/${car.slug}`} className="block">
-        <div className="relative aspect-[16/9] bg-muted">
+        <div className="relative aspect-[16/9] overflow-hidden bg-muted">
           {img ? (
             <Image
               src={img}
               alt={`${car.brand} ${car.model}`}
               fill
-              className="object-cover grayscale"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
               sizes="(max-width:768px) 100vw, 33vw"
             />
           ) : null}

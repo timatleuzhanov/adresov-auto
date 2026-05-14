@@ -11,7 +11,21 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-const img = (seed: string) => `https://picsum.photos/seed/${seed}/1200/675`;
+/** Стабильные фото автомобилей и салона (Unsplash, демо). */
+const U = (photoId: string, w = 1400) =>
+  `https://images.unsplash.com/${photoId}?auto=format&fit=crop&w=${w}&q=82`;
+
+const STOCK = {
+  sportage: [
+    U("photo-1533473359331-0135ef1b58bf"),
+    U("photo-1549317661-bd32c8ce0db2"),
+    U("photo-1503376780353-7e669276fa82"),
+  ],
+  camry: [U("photo-1621007947382-bb3c3994e3fb"), U("photo-1583121274602-3a282cdb7bfa")],
+  tucson: [U("photo-1519641471654-76ce0107ad1b")],
+  bmw: [U("photo-1555215695-3004980ad54e"), U("photo-1617531653332-bd46c24f0668")],
+  promo: U("photo-1560472354-b33ff0c44a43", 1600),
+} as const;
 
 async function main() {
   const adminPass = process.env.ADMIN_SEED_PASSWORD || "Admin123!";
@@ -98,7 +112,7 @@ async function main() {
       status: CarStatus.IN_STOCK,
       tagsJson: JSON.stringify(["Новинка", "Хит продаж"]),
       featured: true,
-      images: [img("sportage1"), img("sportage2"), img("sportage3")],
+      images: [...STOCK.sportage],
       trims: [
         { name: "Comfort", price: 15_990_000, options: ["Мультимедиа 8 дюймов", "Камера заднего вида"] },
         { name: "Prestige", price: 17_490_000, options: ["Панорама", "Подогрев руля", "LED"] },
@@ -128,7 +142,7 @@ async function main() {
       status: CarStatus.IN_STOCK,
       tagsJson: JSON.stringify(["С пробегом"]),
       featured: true,
-      images: [img("camry1"), img("camry2")],
+      images: [...STOCK.camry],
       trims: [{ name: "Premium", price: 18_500_000, options: ["Кожа", "JBL", "TSS 2.5"] }],
     },
     {
@@ -155,7 +169,7 @@ async function main() {
       status: CarStatus.ON_ORDER,
       tagsJson: JSON.stringify(["Акция"]),
       featured: true,
-      images: [img("tucson1")],
+      images: [...STOCK.tucson],
       trims: [{ name: "Style", price: 16_200_000, options: ["SmartSense", "Приборная панель 12.3 дюйма"] }],
     },
     {
@@ -182,7 +196,7 @@ async function main() {
       status: CarStatus.IN_STOCK,
       tagsJson: JSON.stringify([]),
       featured: true,
-      images: [img("x51"), img("x52")],
+      images: [...STOCK.bmw],
       trims: [{ name: "xDrive40i", price: 42_000_000, options: ["M-пакет", "Пневмоподвеска"] }],
     },
   ];
@@ -216,7 +230,7 @@ async function main() {
       data: {
         title: "Кредит от 0% на выбранные модели",
         description: "Специальные условия банков-партнёров до конца месяца.",
-        image: img("promo1"),
+        image: STOCK.promo,
         startDate: now,
         endDate: promoEnd,
         cars: {

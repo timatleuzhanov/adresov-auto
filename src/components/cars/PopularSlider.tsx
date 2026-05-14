@@ -1,6 +1,6 @@
 "use client";
 
-import { Navigation } from "swiper/modules";
+import { Autoplay, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -10,8 +10,14 @@ import { CarCard } from "@/components/cars/CarCard";
 export function PopularSlider({ cars }: { cars: CarCardModel[] }) {
   return (
     <Swiper
-      modules={[Navigation]}
+      modules={[Navigation, Autoplay]}
       navigation
+      autoplay={{
+        delay: 5200,
+        pauseOnMouseEnter: true,
+        disableOnInteraction: false,
+      }}
+      speed={650}
       spaceBetween={16}
       slidesPerView={1.05}
       breakpoints={{
