@@ -3,7 +3,6 @@ const {
   resolveDatabaseUrlForPrisma,
   isPostgresUrl,
   isSqliteFileUrl,
-  sqliteUrlOnRenderPersistentDisk,
   assertSqliteUrlNotDirectory,
 } = require("./render-db-util.cjs");
 
@@ -15,12 +14,10 @@ if (isSqliteFileUrl(db)) {
   assertSqliteUrlNotDirectory(db);
 }
 
-if (
-  isSqliteFileUrl(db) &&
-  process.env.RENDER === "true" &&
-  sqliteUrlOnRenderPersistentDisk(db)
-) {
-  console.log("[render-start] SQLite на постоянном диске Render: prisma db push перед next start");
+/* На Render при `npm start` раньше вызывался только next start — без db push на диске
+ * остаётся пустой файл и P2021 (таблиц нет). Idempotent push перед сервером. */
+if (process.env.RENDER === "true" && isSqliteFileUrl(db) && !isPostgresUrl(db)) {
+  console.log("[render-start] SQLite на Render: prisma db push перед next start");
   execSync("npx prisma db push --skip-generate", { stdio: "inherit", env: childEnv });
 }
 

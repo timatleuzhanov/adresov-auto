@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
-    "start": "next start",
+    "start": "node scripts/render-start.cjs",
     "lint": "next lint",
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
