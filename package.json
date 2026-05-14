@@ -14,7 +14,8 @@
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "logo:generate": "node scripts/generate-logo.cjs",
-    "render:build": "node scripts/render-build.cjs"
+    "render:build": "node scripts/render-build.cjs",
+    "render:start": "node scripts/render-start.cjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
