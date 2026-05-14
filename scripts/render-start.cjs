@@ -21,4 +21,10 @@ if (process.env.RENDER === "true" && isSqliteFileUrl(db) && !isPostgresUrl(db)) 
   execSync("npx prisma db push --skip-generate", { stdio: "inherit", env: childEnv });
 }
 
+/* db push не создаёт пользователей — без seed в БД нет admin@adresov.kz, логин как «неверный пароль». */
+if (process.env.RENDER === "true") {
+  console.log("[render-start] prisma/ensure-admin.ts — админ и настройки сайта");
+  execSync("npx tsx prisma/ensure-admin.ts", { stdio: "inherit", env: childEnv });
+}
+
 execSync("next start", { stdio: "inherit", env: childEnv });
