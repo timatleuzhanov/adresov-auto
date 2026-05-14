@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 import { CarStatus } from "@prisma/client";
+import { getPublicSiteOrigin } from "@/lib/site-url";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const base = getPublicSiteOrigin();
   const cars = await prisma.car.findMany({
     where: { status: { not: CarStatus.ARCHIVE } },
     select: { slug: true, updatedAt: true },

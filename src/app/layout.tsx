@@ -4,6 +4,7 @@ import "./globals.css";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { prisma } from "@/lib/prisma";
+import { getPublicSiteUrl } from "@/lib/site-url";
 
 /** Не дергать БД на этапе `next build` без DATABASE_URL (удобнее локально и в CI). */
 export const dynamic = "force-dynamic";
@@ -25,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: s?.siteTitle ?? "ADRESOV AUTO",
     description: s?.siteDescription ?? "Официальный автосалон в Алматы",
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+    metadataBase: getPublicSiteUrl(),
     openGraph: {
       title: s?.siteTitle ?? "ADRESOV AUTO",
       description: s?.siteDescription ?? "",
