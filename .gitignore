@@ -36,5 +36,11 @@ yarn-error.log*
 /prisma/dev.db
 /prisma/dev.db-journal
 
+# ephemeral DB only for Render `next build` when real DB is on persistent disk
+.render-build.sqlite
+.render-build.sqlite-journal
+.render-build.sqlite-wal
+.render-build.sqlite-shm
+
 *.tsbuildinfo
 next-env.d.ts

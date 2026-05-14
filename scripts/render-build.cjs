@@ -9,6 +9,25 @@ const {
   assertSqliteUrlNotDirectory,
 } = require("./render-db-util.cjs");
 
+/** Только для `next build` на Render: диск /var/data недоступен, Prisma всё равно дергается при SSG. */
+const TEMP_BUILD_SQLITE = "file:./.render-build.sqlite";
+
+function unlinkIfExists(p) {
+  try {
+    if (fs.existsSync(p)) fs.unlinkSync(p);
+  } catch (_) {
+    /* ignore */
+  }
+}
+
+function cleanupRenderBuildTempSqlite() {
+  const file = path.join(process.cwd(), ".render-build.sqlite");
+  unlinkIfExists(file);
+  unlinkIfExists(`${file}-journal`);
+  unlinkIfExists(`${file}-wal`);
+  unlinkIfExists(`${file}-shm`);
+}
+
 resolveDatabaseUrlForPrisma();
 const db = process.env.DATABASE_URL || "";
 const childEnv = { ...process.env, DATABASE_URL: db };
@@ -59,7 +78,29 @@ try {
     }
   }
 
-  execSync("npx next build", { stdio: "inherit", env: childEnv });
+  let nextBuildEnv = childEnv;
+  let usedTempSqliteForNextBuild = false;
+  try {
+    if (
+      process.env.RENDER === "true" &&
+      !isPostgresUrl(db) &&
+      isSqliteFileUrl(db) &&
+      sqliteUrlOnRenderPersistentDisk(db)
+    ) {
+      usedTempSqliteForNextBuild = true;
+      nextBuildEnv = { ...childEnv, DATABASE_URL: TEMP_BUILD_SQLITE };
+      console.log(
+        "[render-build] Временный SQLite для next build (SSG вызывает API/Prisma; постоянный диск при сборке недоступен)."
+      );
+      execSync("npx prisma db push --skip-generate", { stdio: "inherit", env: nextBuildEnv });
+    }
+
+    execSync("npx next build", { stdio: "inherit", env: nextBuildEnv });
+  } finally {
+    if (usedTempSqliteForNextBuild) {
+      cleanupRenderBuildTempSqlite();
+    }
+  }
 } catch (e) {
   if (schemaSwitched && originalSchema) {
     fs.writeFileSync(schemaPath, originalSchema);
