@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getAdminSession, canEditCars } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { DeleteCarButton } from "./DeleteCarButton";
 
 export default async function AdminCarsPage() {
   const s = await getAdminSession();
@@ -29,6 +30,7 @@ export default async function AdminCarsPage() {
               <th className="py-2">Авто</th>
               <th className="py-2">Статус</th>
               <th className="py-2">Цена</th>
+              <th className="py-2 w-16"></th>
             </tr>
           </thead>
           <tbody>
@@ -42,6 +44,9 @@ export default async function AdminCarsPage() {
                 </td>
                 <td className="py-3">{c.status}</td>
                 <td className="py-3">{c.priceOnRequest ? "По запросу" : c.priceFrom?.toLocaleString("ru-RU")}</td>
+                <td className="py-3">
+                  <DeleteCarButton carId={c.id} carName={`${c.brand} ${c.model} ${c.year}`} />
+                </td>
               </tr>
             ))}
           </tbody>

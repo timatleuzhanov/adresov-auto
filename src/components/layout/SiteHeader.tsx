@@ -76,13 +76,13 @@ export function SiteHeader() {
         <div className="hidden items-center gap-3 md:flex">
           <AppSwitchers dark />
           {tg && (
-            <a href={tg} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-logo/80 hover:text-logo-bright">
-              Telegram
+            <a href={tg} target="_blank" rel="noopener noreferrer" className="opacity-75 transition hover:opacity-100" aria-label="Telegram">
+              <Image src="/images/tg.png" alt="Telegram" width={22} height={22} className="h-[22px] w-[22px] object-contain" />
             </a>
           )}
           {ig && (
-            <a href={ig} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-logo/80 hover:text-logo-bright">
-              Instagram
+            <a href={ig} target="_blank" rel="noopener noreferrer" className="opacity-75 transition hover:opacity-100" aria-label="Instagram">
+              <Image src="/images/inst.png" alt="Instagram" width={22} height={22} className="h-[22px] w-[22px] object-contain" />
             </a>
           )}
           <Link
@@ -112,13 +112,13 @@ export function SiteHeader() {
             ))}
             <div className="flex gap-4 pt-2">
               {tg && (
-                <a href={tg} className="text-logo/80 hover:text-logo-bright" target="_blank" rel="noreferrer">
-                  Telegram
+                <a href={tg} target="_blank" rel="noreferrer" className="opacity-75 transition hover:opacity-100" aria-label="Telegram">
+                  <Image src="/images/tg.png" alt="Telegram" width={24} height={24} className="h-6 w-6 object-contain" />
                 </a>
               )}
               {ig && (
-                <a href={ig} className="text-logo/80 hover:text-logo-bright" target="_blank" rel="noreferrer">
-                  Instagram
+                <a href={ig} target="_blank" rel="noreferrer" className="opacity-75 transition hover:opacity-100" aria-label="Instagram">
+                  <Image src="/images/inst.png" alt="Instagram" width={24} height={24} className="h-6 w-6 object-contain" />
                 </a>
               )}
             </div>
