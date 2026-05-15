@@ -8,6 +8,7 @@ import { LeadForm } from "@/components/forms/LeadForm";
 import { CarCard } from "@/components/cars/CarCard";
 import { Reveal } from "@/components/motion/Reveal";
 import { PriceDisplay } from "@/components/cars/PriceDisplay";
+import { CurrencyToggle } from "@/components/cars/CurrencyToggle";
 import { TrimList } from "@/components/cars/TrimList";
 
 function tags(tagsJson: string): string[] {
@@ -108,8 +109,15 @@ export default async function CarPage({ params }: { params: { slug: string } }) 
             {car.brand} {car.model} {car.year}
           </h1>
           <p className="mt-2 text-sm text-sub">{statusLabel(car.status)}</p>
-          <div className="mt-4 font-heading text-3xl font-bold text-ink">
-            <PriceDisplay priceFrom={car.priceFrom} priceOnRequest={car.priceOnRequest} />
+          <div className="mt-4">
+            <div className="font-heading text-3xl font-bold text-ink">
+              <PriceDisplay priceFrom={car.priceFrom} priceOnRequest={car.priceOnRequest} />
+            </div>
+            {!car.priceOnRequest && car.priceFrom != null && (
+              <div className="mt-2">
+                <CurrencyToggle />
+              </div>
+            )}
           </div>
           <p className="mt-4 text-sub">{car.description}</p>
           <div className="mt-4 flex flex-wrap gap-2">

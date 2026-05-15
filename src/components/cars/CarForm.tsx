@@ -96,7 +96,7 @@ export function CarForm({ initial, carId }: { initial?: CarFormInitial; carId?: 
   const [titleSeo, setTitleSeo] = useState(initial?.titleSeo ?? "");
   const [descSeo, setDescSeo] = useState(initial?.descSeo ?? "");
   const [imagesText, setImagesText] = useState(
-    initial?.images?.join("\n") ?? "https://picsum.photos/seed/newcar/1200/675"
+    initial?.images?.join("\n") ?? ""
   );
   const [trims, setTrims] = useState<TrimRow[]>(
     initial?.trims?.length

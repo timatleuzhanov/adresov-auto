@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Car, CarImage } from "@prisma/client";
 import { PriceDisplay } from "./PriceDisplay";
+import { CurrencyToggle } from "./CurrencyToggle";
 import { useLocale } from "@/lib/locale";
 
 export type CarCardModel = Car & { images: CarImage[] };
@@ -63,8 +64,15 @@ export function CarCard({ car }: { car: CarCardModel }) {
             · {car.mileage ? `${car.mileage.toLocaleString("ru-RU")} ${t.car.km}` : `0 ${t.car.km}`}
           </div>
         </div>
-        <div className="font-heading text-xl font-bold text-ink">
-          <PriceDisplay priceFrom={car.priceFrom} priceOnRequest={car.priceOnRequest} showFrom />
+        <div>
+          <div className="font-heading text-xl font-bold text-ink">
+            <PriceDisplay priceFrom={car.priceFrom} priceOnRequest={car.priceOnRequest} showFrom />
+          </div>
+          {!car.priceOnRequest && car.priceFrom != null && (
+            <div className="mt-1.5">
+              <CurrencyToggle />
+            </div>
+          )}
         </div>
         <div className="flex flex-wrap gap-2">
           <Link
