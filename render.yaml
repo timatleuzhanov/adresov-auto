@@ -22,3 +22,7 @@ services:
         sync: false
       - key: NEXT_PUBLIC_SITE_URL
         sync: false
+    disk:
+      name: adresov-data
+      mountPath: /var/data
+      sizeGB: 1

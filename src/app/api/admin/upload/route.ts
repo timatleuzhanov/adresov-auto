@@ -5,6 +5,14 @@ import sharp from "sharp";
 import { getAdminSession, canEditCars } from "@/lib/auth";
 import { randomUUID } from "crypto";
 
+// На Render сохраняем на персистентный диск /var/data, локально — в public/uploads
+function getUploadsDir() {
+  if (process.env.RENDER === "true") {
+    return "/var/data/uploads";
+  }
+  return path.join(process.cwd(), "public", "uploads");
+}
+
 export async function POST(req: Request) {
   const session = await getAdminSession();
   if (!session || !canEditCars(session.role)) {
@@ -27,7 +35,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Допустимы JPEG, PNG, WebP" }, { status: 400 });
   }
 
-  const uploadsDir = path.join(process.cwd(), "public", "uploads");
+  const uploadsDir = getUploadsDir();
   await mkdir(uploadsDir, { recursive: true });
   const name = `${randomUUID()}.webp`;
   const outPath = path.join(uploadsDir, name);
@@ -38,5 +46,5 @@ export async function POST(req: Request) {
     .webp({ quality: 82 })
     .toFile(outPath);
 
-  return NextResponse.json({ url: `/uploads/${name}` });
+  return NextResponse.json({ url: `/api/image/${name}` });
 }

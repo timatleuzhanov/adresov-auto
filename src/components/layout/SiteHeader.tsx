@@ -5,16 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
-
-const links = [
-  { href: "/catalog", label: "Модели" },
-  { href: "/promotions", label: "Акции" },
-  { href: "/credit", label: "Кредит" },
-  { href: "/trade-in", label: "Trade-in" },
-  { href: "/service", label: "Сервис" },
-  { href: "/about", label: "О компании" },
-  { href: "/contacts", label: "Контакты" },
-];
+import { useLocale } from "@/lib/locale";
+import { AppSwitchers } from "./AppSwitchers";
 
 type SiteJson = {
   telegramUrl?: string | null;
@@ -25,6 +17,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [social, setSocial] = useState<SiteJson>({});
+  const { t } = useLocale();
   const isAdmin = pathname?.startsWith("/admin") ?? false;
 
   useEffect(() => {
@@ -42,6 +35,16 @@ export function SiteHeader() {
 
   const tg = social.telegramUrl || process.env.NEXT_PUBLIC_TELEGRAM_URL;
   const ig = social.instagramUrl || process.env.NEXT_PUBLIC_INSTAGRAM_URL;
+
+  const links = [
+    { href: "/catalog", label: t.nav.models },
+    { href: "/promotions", label: t.nav.promotions },
+    { href: "/credit", label: t.nav.credit },
+    { href: "/trade-in", label: t.nav.trade_in },
+    { href: "/service", label: t.nav.service },
+    { href: "/about", label: t.nav.about },
+    { href: "/contacts", label: t.nav.contacts },
+  ];
 
   return (
     <header className="sticky top-0 z-50 border-b border-logo/20 bg-black text-logo">
@@ -71,6 +74,7 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="hidden items-center gap-3 md:flex">
+          <AppSwitchers dark />
           {tg && (
             <a href={tg} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-logo/80 hover:text-logo-bright">
               Telegram
@@ -85,7 +89,7 @@ export function SiteHeader() {
             href="/catalog"
             className="rounded border border-logo bg-logo px-4 py-2 text-xs font-semibold uppercase tracking-wide text-black hover:bg-logo-bright"
           >
-            Каталог
+            {t.catalog}
           </Link>
         </div>
         <button
@@ -118,8 +122,11 @@ export function SiteHeader() {
                 </a>
               )}
             </div>
+            <div className="pt-1">
+              <AppSwitchers dark />
+            </div>
             <Link href="/catalog" className="rounded border border-logo bg-logo py-2 text-center text-sm font-semibold text-black hover:bg-logo-bright">
-              Каталог
+              {t.catalog}
             </Link>
           </div>
         </div>

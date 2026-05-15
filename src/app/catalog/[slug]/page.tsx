@@ -3,11 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LeadType, CarStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { formatPriceTenge } from "@/lib/format";
 import { CarGallery } from "@/components/cars/CarGallery";
 import { LeadForm } from "@/components/forms/LeadForm";
 import { CarCard } from "@/components/cars/CarCard";
 import { Reveal } from "@/components/motion/Reveal";
+import { PriceDisplay } from "@/components/cars/PriceDisplay";
+import { TrimList } from "@/components/cars/TrimList";
 
 function tags(tagsJson: string): string[] {
   try {
@@ -60,15 +61,6 @@ export default async function CarPage({ params }: { params: { slug: string } }) 
     orderBy: { createdAt: "desc" },
   });
 
-  const optionsForTrim = (json: string) => {
-    try {
-      const t = JSON.parse(json) as unknown;
-      return Array.isArray(t) ? t.map(String) : [];
-    } catch {
-      return [];
-    }
-  };
-
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Car",
@@ -117,7 +109,7 @@ export default async function CarPage({ params }: { params: { slug: string } }) 
           </h1>
           <p className="mt-2 text-sm text-sub">{statusLabel(car.status)}</p>
           <div className="mt-4 font-heading text-3xl font-bold text-ink">
-            {formatPriceTenge(car.priceFrom, car.priceOnRequest)}
+            <PriceDisplay priceFrom={car.priceFrom} priceOnRequest={car.priceOnRequest} />
           </div>
           <p className="mt-4 text-sub">{car.description}</p>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -155,20 +147,7 @@ export default async function CarPage({ params }: { params: { slug: string } }) 
 
       <section className="mt-12">
         <h2 className="font-heading text-2xl font-bold text-primary">Комплектации</h2>
-        <div className="mt-4 space-y-3">
-          {car.trims.map((tr) => (
-            <details key={tr.id} className="rounded-card border border-black/10 bg-white p-4 shadow-card">
-              <summary className="cursor-pointer font-heading text-lg font-semibold text-primary">
-                {tr.name} — {tr.price.toLocaleString("ru-RU")} ₸
-              </summary>
-              <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-sub">
-                {optionsForTrim(tr.optionsJson).map((o) => (
-                  <li key={o}>{o}</li>
-                ))}
-              </ul>
-            </details>
-          ))}
-        </div>
+        <TrimList trims={car.trims} />
       </section>
 
       <section className="mt-12" id="request">

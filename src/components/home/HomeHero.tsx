@@ -51,7 +51,7 @@ export function HomeHero({
             sizes="100vw"
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-black/82 to-black/95" />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/52 to-black/72" />
         <motion.div
           className="absolute -left-1/4 top-0 h-[70%] w-1/2 skew-x-12 bg-gradient-to-r from-logo/12 to-transparent"
           initial={{ opacity: 0, x: -40 }}

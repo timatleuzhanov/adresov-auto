@@ -3,6 +3,7 @@ import { Montserrat, Inter } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { Providers } from "@/components/layout/Providers";
 import { prisma } from "@/lib/prisma";
 import { getPublicSiteUrl } from "@/lib/site-url";
 
@@ -41,9 +42,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ru" className={`${montserrat.variable} ${inter.variable}`}>
       <body className="min-h-screen bg-white font-sans antialiased" style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}>
-        <SiteHeader />
-        <main className="min-h-[60vh]">{children}</main>
-        <SiteFooter />
+        <Providers>
+          <SiteHeader />
+          <main className="min-h-[60vh]">{children}</main>
+          <SiteFooter />
+        </Providers>
       </body>
     </html>
   );
