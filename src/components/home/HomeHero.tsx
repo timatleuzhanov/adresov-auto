@@ -4,9 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-/** Unsplash — ночной снимок спорткара (демо). */
-export const HOME_HERO_IMAGE =
-  "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1920&q=86";
+/** Фон первого экрана: `public/images/1.jpg` */
+export const HOME_HERO_IMAGE = "/images/1.jpg";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
