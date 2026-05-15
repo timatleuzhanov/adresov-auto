@@ -93,7 +93,34 @@ export const translations = {
   },
 } as const;
 
-export type T = (typeof translations)["ru"];
+export type T = {
+  nav: {
+    models: string;
+    promotions: string;
+    credit: string;
+    trade_in: string;
+    service: string;
+    about: string;
+    contacts: string;
+  };
+  catalog: string;
+  more: string;
+  request: string;
+  car: {
+    new: string;
+    used: string;
+    in_stock: string;
+    on_order: string;
+    sold: string;
+    auto: string;
+    manual: string;
+    variator: string;
+    price_on_request: string;
+    clarify: string;
+    from: string;
+    km: string;
+  };
+};
 
 type LocaleContextType = {
   locale: Locale;

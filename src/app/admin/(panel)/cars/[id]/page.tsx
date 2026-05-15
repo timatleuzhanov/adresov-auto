@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getAdminSession, canEditCars } from "@/lib/auth";
-import { redirect } from "next/navigation";
+import { CarForm, type CarFormInitial } from "@/components/cars/CarForm";
 
 export default async function AdminCarDetailPage({ params }: { params: { id: string } }) {
   const s = await getAdminSession();
@@ -11,47 +11,54 @@ export default async function AdminCarDetailPage({ params }: { params: { id: str
 
   const car = await prisma.car.findUnique({
     where: { id: params.id },
-    include: { images: { orderBy: { sort: "asc" } }, trims: true },
+    include: { images: { orderBy: { sort: "asc" } }, trims: { orderBy: { price: "asc" } } },
   });
   if (!car) notFound();
 
+  const initial: CarFormInitial = {
+    brand: car.brand,
+    model: car.model,
+    year: car.year,
+    slug: car.slug,
+    bodyType: car.bodyType,
+    fuel: car.fuel,
+    transmission: car.transmission,
+    condition: car.condition,
+    status: car.status,
+    featured: car.featured,
+    priceFrom: car.priceFrom,
+    priceOnRequest: car.priceOnRequest,
+    mileage: car.mileage,
+    engine: car.engine,
+    drive: car.drive,
+    acceleration: car.acceleration,
+    maxSpeed: car.maxSpeed,
+    fuelConsumption: car.fuelConsumption,
+    trunkVolume: car.trunkVolume,
+    color: car.color,
+    vin: car.vin,
+    description: car.description,
+    titleSeo: car.titleSeo,
+    descSeo: car.descSeo,
+    images: car.images.map((im) => im.path),
+    trims: car.trims.map((t) => ({ name: t.name, price: t.price, optionsJson: t.optionsJson })),
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="rounded-card bg-white p-6 shadow-card">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h1 className="font-heading text-2xl font-bold text-primary">
-              {car.brand} {car.model} {car.year}
-            </h1>
-            <p className="mt-1 text-sm text-sub">{car.slug}</p>
-          </div>
-          <Link className="text-sm font-semibold text-primary hover:underline" href={`/catalog/${car.slug}`}>
-            Открыть на сайте →
-          </Link>
-        </div>
-        <dl className="mt-6 grid gap-3 text-sm md:grid-cols-2">
-          <div>
-            <dt className="text-sub">Статус</dt>
-            <dd className="font-medium">{car.status}</dd>
-          </div>
-          <div>
-            <dt className="text-sub">Цена</dt>
-            <dd className="font-medium">{car.priceOnRequest ? "По запросу" : car.priceFrom?.toLocaleString("ru-RU")}</dd>
-          </div>
-          <div className="md:col-span-2">
-            <dt className="text-sub">Описание</dt>
-            <dd className="font-medium">{car.description}</dd>
-          </div>
-        </dl>
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link href="/admin/cars" className="text-sm text-neutral-500 hover:underline">
+          ← Все автомобили
+        </Link>
+        <Link
+          href={`/catalog/${car.slug}`}
+          target="_blank"
+          className="text-sm font-semibold text-primary hover:underline"
+        >
+          Открыть на сайте →
+        </Link>
       </div>
-      <div className="rounded-card bg-white p-6 shadow-card">
-        <h2 className="font-heading text-lg font-bold text-primary">Фото ({car.images.length})</h2>
-        <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-sub">
-          {car.images.map((im) => (
-            <li key={im.id}>{im.path}</li>
-          ))}
-        </ul>
-      </div>
+      <CarForm initial={initial} carId={car.id} />
     </div>
   );
 }
