@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 
 /** Фон первого экрана: `public/images/1.jpg` */
-export const HOME_HERO_IMAGE = "/images/1.jpg";
+export const HOME_HERO_IMAGE = "public/images/1.jpg";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
