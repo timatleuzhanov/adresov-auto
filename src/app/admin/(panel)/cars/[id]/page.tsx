@@ -27,6 +27,8 @@ export default async function AdminCarDetailPage({ params }: { params: { id: str
     status: car.status,
     featured: car.featured,
     priceFrom: car.priceFrom,
+    priceUsd: (car as { priceUsd?: number | null }).priceUsd ?? null,
+    priceRub: (car as { priceRub?: number | null }).priceRub ?? null,
     priceOnRequest: car.priceOnRequest,
     mileage: car.mileage,
     engine: car.engine,

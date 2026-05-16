@@ -24,6 +24,8 @@ export type CarFormInitial = {
   status: CarStatus;
   featured: boolean;
   priceFrom: number | null;
+  priceUsd: number | null;
+  priceRub: number | null;
   priceOnRequest: boolean;
   mileage: number;
   engine: string;
@@ -81,7 +83,19 @@ export function CarForm({ initial, carId }: { initial?: CarFormInitial; carId?: 
   const [condition, setCondition] = useState<CarCondition>(initial?.condition ?? CarCondition.NEW);
   const [status, setStatus] = useState<CarStatus>(initial?.status ?? CarStatus.IN_STOCK);
   const [priceFrom, setPriceFrom] = useState(initial?.priceFrom != null ? String(initial.priceFrom) : "");
+  const [priceUsd, setPriceUsd] = useState(initial?.priceUsd != null ? String(initial.priceUsd) : "");
+  const [priceRub, setPriceRub] = useState(initial?.priceRub != null ? String(initial.priceRub) : "");
   const [priceOnRequest, setPriceOnRequest] = useState(initial?.priceOnRequest ?? false);
+
+  // Авторасчёт при изменении KZT
+  function handleKztChange(val: string) {
+    setPriceFrom(val);
+    const kzt = parseInt(val.replace(/\s/g, ""), 10);
+    if (!isNaN(kzt) && kzt > 0) {
+      if (!priceUsd) setPriceUsd(String(Math.round(kzt / 510)));
+      if (!priceRub) setPriceRub(String(Math.round(kzt / 5.6)));
+    }
+  }
   const [mileage, setMileage] = useState(String(initial?.mileage ?? 0));
   const [engine, setEngine] = useState(initial?.engine ?? "");
   const [drive, setDrive] = useState(initial?.drive ?? "");
@@ -172,6 +186,8 @@ export function CarForm({ initial, carId }: { initial?: CarFormInitial; carId?: 
     }
 
     const priceNum = priceFrom ? parseInt(priceFrom.replace(/\s/g, ""), 10) : null;
+    const priceUsdNum = priceUsd ? parseInt(priceUsd.replace(/\s/g, ""), 10) : null;
+    const priceRubNum = priceRub ? parseInt(priceRub.replace(/\s/g, ""), 10) : null;
 
     const payload = {
       brand: brand.trim(),
@@ -183,6 +199,8 @@ export function CarForm({ initial, carId }: { initial?: CarFormInitial; carId?: 
       transmission,
       condition,
       priceFrom: priceOnRequest ? null : priceNum,
+      priceUsd: priceOnRequest ? null : priceUsdNum,
+      priceRub: priceOnRequest ? null : priceRubNum,
       priceOnRequest,
       mileage: parseInt(mileage.replace(/\s/g, ""), 10) || 0,
       engine: engine.trim(),
@@ -311,7 +329,15 @@ export function CarForm({ initial, carId }: { initial?: CarFormInitial; carId?: 
         </label>
         <label className="text-sm">
           Цена «от», ₸
-          <input className="mt-1 w-full rounded border border-neutral-300 px-3 py-2" value={priceFrom} onChange={(e) => setPriceFrom(e.target.value)} disabled={priceOnRequest} />
+          <input className="mt-1 w-full rounded border border-neutral-300 px-3 py-2" value={priceFrom} onChange={(e) => handleKztChange(e.target.value)} disabled={priceOnRequest} placeholder="89000000" />
+        </label>
+        <label className="text-sm">
+          Цена, $
+          <input className="mt-1 w-full rounded border border-neutral-300 px-3 py-2" value={priceUsd} onChange={(e) => setPriceUsd(e.target.value)} disabled={priceOnRequest} placeholder="авторасчёт" />
+        </label>
+        <label className="text-sm">
+          Цена, ₽
+          <input className="mt-1 w-full rounded border border-neutral-300 px-3 py-2" value={priceRub} onChange={(e) => setPriceRub(e.target.value)} disabled={priceOnRequest} placeholder="авторасчёт" />
         </label>
         <label className="text-sm">
           Пробег, км

@@ -111,7 +111,12 @@ export default async function CarPage({ params }: { params: { slug: string } }) 
           <p className="mt-2 text-sm text-sub">{statusLabel(car.status)}</p>
           <div className="mt-4">
             <div className="font-heading text-3xl font-bold text-ink">
-              <PriceDisplay priceFrom={car.priceFrom} priceOnRequest={car.priceOnRequest} />
+              <PriceDisplay
+                priceFrom={car.priceFrom}
+                priceUsd={(car as { priceUsd?: number | null }).priceUsd}
+                priceRub={(car as { priceRub?: number | null }).priceRub}
+                priceOnRequest={car.priceOnRequest}
+              />
             </div>
             {!car.priceOnRequest && car.priceFrom != null && (
               <div className="mt-2">

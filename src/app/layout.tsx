@@ -28,6 +28,11 @@ export async function generateMetadata(): Promise<Metadata> {
     title: s?.siteTitle ?? "ADRESOV AUTO",
     description: s?.siteDescription ?? "Официальный автосалон в Алматы",
     metadataBase: getPublicSiteUrl(),
+    icons: {
+      icon: "/images/favicon.png",
+      shortcut: "/images/favicon.png",
+      apple: "/images/favicon.png",
+    },
     openGraph: {
       title: s?.siteTitle ?? "ADRESOV AUTO",
       description: s?.siteDescription ?? "",

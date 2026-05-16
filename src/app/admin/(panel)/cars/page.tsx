@@ -42,7 +42,18 @@ export default async function AdminCarsPage() {
                   </Link>
                   <div className="text-xs text-sub">{c.slug}</div>
                 </td>
-                <td className="py-3">{c.status}</td>
+                <td className="py-3">
+                  <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
+                    c.status === "IN_STOCK" ? "bg-green-100 text-green-700" :
+                    c.status === "ON_ORDER" ? "bg-blue-100 text-blue-700" :
+                    c.status === "SOLD" ? "bg-neutral-100 text-neutral-500" :
+                    "bg-red-100 text-red-500"
+                  }`}>
+                    {c.status === "IN_STOCK" ? "В наличии" :
+                     c.status === "ON_ORDER" ? "Под заказ" :
+                     c.status === "SOLD" ? "Продано" : "Архив"}
+                  </span>
+                </td>
                 <td className="py-3">{c.priceOnRequest ? "По запросу" : c.priceFrom?.toLocaleString("ru-RU")}</td>
                 <td className="py-3">
                   <DeleteCarButton carId={c.id} carName={`${c.brand} ${c.model} ${c.year}`} />

@@ -69,6 +69,8 @@ model Car {
   transmission     TransmissionType
   condition        CarCondition
   priceFrom        Int?
+  priceUsd         Int?
+  priceRub         Int?
   priceOnRequest   Boolean            @default(false)
   mileage          Int                @default(0)
   engine           String
