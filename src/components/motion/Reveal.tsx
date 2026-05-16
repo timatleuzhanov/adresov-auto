@@ -1,10 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 
 type Variant = "up" | "fade" | "left" | "right" | "scale";
 
-const variants: Record<Variant, { hidden: object; show: object }> = {
+const variants: Record<Variant, Variants> = {
   up: {
     hidden: { opacity: 0, y: 32 },
     show: { opacity: 1, y: 0 },
