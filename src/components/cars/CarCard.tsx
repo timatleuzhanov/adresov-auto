@@ -66,7 +66,13 @@ export function CarCard({ car }: { car: CarCardModel }) {
         </div>
         <div>
           <div className="font-heading text-xl font-bold text-ink">
-            <PriceDisplay priceFrom={car.priceFrom} priceOnRequest={car.priceOnRequest} showFrom />
+            <PriceDisplay
+              priceFrom={car.priceFrom}
+              priceUsd={(car as { priceUsd?: number | null }).priceUsd}
+              priceRub={(car as { priceRub?: number | null }).priceRub}
+              priceOnRequest={car.priceOnRequest}
+              showFrom
+            />
           </div>
           {!car.priceOnRequest && car.priceFrom != null && (
             <div className="mt-1.5">
